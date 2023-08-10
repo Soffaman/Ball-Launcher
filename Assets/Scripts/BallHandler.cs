@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,13 @@ public class BallHandler : MonoBehaviour
 {
     [SerializeField]
     private Rigidbody2D currentBallRigidbody;
+    [SerializeField]
+    private SpringJoint2D currentBallSpringJoint;
+
+    public float detachDelay;
 
     private Camera mainCamera;
+    private bool isDragging;
 
     private void Awake()
     {
@@ -18,11 +24,24 @@ public class BallHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (currentBallRigidbody == null)
+        {
+            return;
+         }
+
         if (!Touchscreen.current.primaryTouch.press.isPressed)
         {
-            currentBallRigidbody.isKinematic = false;
+            if (isDragging)
+            {
+                LauncheBall();
+            }
+             
+            isDragging = false;
+            
             return;
         }
+
+        isDragging = true;
         currentBallRigidbody.isKinematic = true;
 
         Vector2 touchPos = Touchscreen.current.primaryTouch.position.ReadValue();
@@ -31,5 +50,19 @@ public class BallHandler : MonoBehaviour
 
         currentBallRigidbody.position = worldPos;
 
+    }
+
+    private void LauncheBall()
+    {
+        currentBallRigidbody.isKinematic = false;
+        currentBallRigidbody = null;
+
+        Invoke(nameof(DetachBall), detachDelay);
+    }
+
+    private void DetachBall()
+    {
+        currentBallSpringJoint.enabled = false;
+        currentBallSpringJoint = null;
     }
 }
