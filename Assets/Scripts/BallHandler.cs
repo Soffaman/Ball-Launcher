@@ -5,10 +5,11 @@ using UnityEngine.InputSystem;
 
 public class BallHandler : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private Camera mainCamera;
+
+    private void Awake()
     {
-        
+        mainCamera = Camera.main;
     }
 
     // Update is called once per frame
@@ -18,9 +19,11 @@ public class BallHandler : MonoBehaviour
         {
             return;
         }
-        Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+        Vector2 touchPos = Touchscreen.current.primaryTouch.position.ReadValue();
 
-        Debug.Log(touchPosition);
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(touchPos);
+
+        Debug.Log(worldPos);
 
     }
 }
